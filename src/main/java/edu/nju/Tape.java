@@ -33,12 +33,12 @@ public class Tape {
             head++;
         }
 
-        if (head == 0) {
+        if (head == -1) {
             tracks.forEach(each -> each.insert(0, B));
-            head = 1;
+            head = 0;
         }
         tracks.forEach(each -> {
-            if (head == each.length() - 1) {
+            if (head == each.length()) {
                 each.append(B);
             }
         });
@@ -52,5 +52,32 @@ public class Tape {
         }
     }
 
+    public int getLowIndex() {
+        int index = head;
+        int tmp = head;
+        while (tmp >= 0) {
+            if (tracks.get(0).charAt(tmp) != B) {
+                index = tmp;
+            }
+            tmp--;
+        }
+        return index;
+    }
 
+    public int getHighIndex() {
+        int index = head;
+        int tmp = head;
+        StringBuilder track = tracks.get(0);
+        while (tmp < track.length()) {
+            if (track.charAt(tmp) != B) {
+                index = tmp;
+            }
+            tmp++;
+        }
+        return index;
+    }
+
+    public int getHead() {
+        return head;
+    }
 }

@@ -16,13 +16,13 @@ public class TuringMachine {
     // 状态集合
     private final Map<String, State> Q;
     // 输入符号集
-    private Set<Character> S;
+    private final Set<Character> S;
     // 磁带符号集
-    private Set<Character> G;
+    private final Set<Character> G;
     // 初始状态
     private String q0;
     // 终止状态集
-    private Set<String> F;
+    private final Set<String> F;
     // 空格符号
     private Character B;
     // 磁带数
@@ -50,7 +50,7 @@ public class TuringMachine {
      * TODO
      * is done in Lab1 ~
      *
-     * @param tm
+     * @param tm tm
      */
     public TuringMachine(String tm) {
         Q = new HashMap<>();
@@ -77,19 +77,17 @@ public class TuringMachine {
 
     private void resolveTuringMachine(String line, int lineNo, Set<String> infoSet) {
         char info = line.charAt(1);
-        int tfNum = 0;
-        int errorNum = 0;
         switch (info) {
             case 'Q':
                 setStatesSet(line, lineNo);
                 infoSet.add("Q");
                 break;
             case 'S':
-                setAlphabet(line, lineNo, S);
+                setAlphabet(line, lineNo, S, getInvalidOfS());
                 infoSet.add("S");
                 break;
             case 'G':
-                setAlphabet(line, lineNo, G);
+                setAlphabet(line, lineNo, G, getInvalidOfG());
                 G.add('_');
                 infoSet.add("G");
                 break;
@@ -110,16 +108,12 @@ public class TuringMachine {
                 infoSet.add("N");
                 break;
             case 'D':
-                tfNum++;
                 if (resolverTransitionFunction(line, lineNo)) {
-                    errorNum++;
+                    infoSet.add("D");
                 }
                 break;
             default:
                 System.err.println("Error: " + lineNo);
-        }
-        if (tfNum > errorNum) {
-            infoSet.add("D");
         }
     }
 
@@ -140,7 +134,7 @@ public class TuringMachine {
         }
     }
 
-    private void setAlphabet(String line, int lineNo, Set<Character> alphabetSet) {
+    private void setAlphabet(String line, int lineNo, Set<Character> alphabetSet, Set<Character> invalidChars) {
         String[] alphabets = Utils.SplitString(line);
         if (alphabets == null) {
             System.err.println("Error: " + lineNo);
@@ -148,7 +142,7 @@ public class TuringMachine {
         }
         for (String alphabet : alphabets) {
             Character ch = alphabet.charAt(0);
-            if (checkAlphabet(ch)) {
+            if (!invalidChars.contains(ch)) {
                 alphabetSet.add(ch);
             } else {
                 System.err.println("Error: " + lineNo);
@@ -175,8 +169,28 @@ public class TuringMachine {
         }
     }
 
-    private boolean checkAlphabet(Character ch) {
-        return ch != ' ' && ch != ',' && ch != ';' && ch != '{' && ch != '}' && ch != '*' && ch != '_';
+    private Set<Character> getInvalidOfS() {
+        Set<Character> set = new HashSet<>();
+        set.add(' ');
+        set.add(',');
+        set.add(';');
+        set.add('{');
+        set.add('}');
+        set.add('*');
+        set.add('_');
+        return set;
+
+    }
+
+    private Set<Character> getInvalidOfG() {
+        Set<Character> set = new HashSet<>();
+        set.add(' ');
+        set.add(',');
+        set.add(';');
+        set.add('{');
+        set.add('}');
+        set.add('*');
+        return set;
     }
 
     private void checkLack(Set<String> infoSet) {
@@ -201,18 +215,22 @@ public class TuringMachine {
      * TODO
      * 停止的两个条件 1. 到了终止态 2. 无路可走，halts
      *
-     * @param q Z
+     * @param q q
+     * @param Z Z
+     * @return boolean
      */
     public boolean isStop(State q, String Z) {
-        return true;
+        if (F.contains(q.getQ())) {
+            return true;
+        } else return q.getDelta(Z) == null;
     }
 
     public boolean checkTape(Set<Character> tape) {
-        return false;
+        return Utils.isSubSet(tape, S);
     }
 
     public boolean checkTapeNum(int tapeNum) {
-        return true;
+        return this.tapeNum == tapeNum;
     }
 
     public Character getB() {
@@ -244,7 +262,7 @@ public class TuringMachine {
      * TODO
      * is done in lab1 ~
      *
-     * @return
+     * @return String
      */
     @Override
     public String toString() {
