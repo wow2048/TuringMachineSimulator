@@ -43,6 +43,4 @@ public class State {
         this.delta.put(tf.getInput(), tf);
     }
 
-
-
 }

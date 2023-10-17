@@ -44,7 +44,6 @@ public class Tape {
         });
     }
 
-
     public void updateTape(String newTape) {
         for (int i = 0; i < newTape.length(); i++) {
             String tmp = newTape.substring(i, i + 1);

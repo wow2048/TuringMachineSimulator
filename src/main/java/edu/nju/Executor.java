@@ -57,6 +57,7 @@ public class Executor {
     public void loadTape(ArrayList<Tape> tapes) {
         if (!tm.checkTapeNum(tapes.size())) {
             System.err.println("Error: 2");
+            canRun = false;
         }
         Set<Character> alphabet = new HashSet<>();
         for (Tape each : tapes) {
@@ -69,6 +70,7 @@ public class Executor {
         alphabet.remove(tm.getB());
         if (!tm.checkTape(alphabet)) {
             System.err.println("Error: 1");
+            canRun = false;
         }
         this.tapes = tapes;
     }
@@ -181,6 +183,4 @@ public class Executor {
             tape.updateHead(d);
         }
     }
-
-
 }

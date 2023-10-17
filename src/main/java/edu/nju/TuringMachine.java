@@ -73,6 +73,7 @@ public class TuringMachine {
             }
         }
         checkLack(infoSet);
+        validate();
     }
 
     private void resolveTuringMachine(String line, int lineNo, Set<String> infoSet) {
@@ -88,7 +89,6 @@ public class TuringMachine {
                 break;
             case 'G':
                 setAlphabet(line, lineNo, G, getInvalidOfG());
-                G.add('_');
                 infoSet.add("G");
                 break;
             case 'q':
@@ -177,7 +177,7 @@ public class TuringMachine {
         set.add('{');
         set.add('}');
         set.add('*');
-        set.add('_');
+//        set.add('_');
         return set;
 
     }
@@ -204,6 +204,21 @@ public class TuringMachine {
             if (!infoSet.contains(each)) {
                 System.err.println("Error: lack" + each);
             }
+        }
+    }
+
+    private void validate() {
+        if (!Utils.isSubSet(F, Q.keySet())) {
+            System.err.println("Error: 3");
+        }
+        if (S.contains(B)) {
+            System.err.println("Error: 4");
+        }
+        if (!G.contains(B)) {
+            System.err.println("Error: 5");
+        }
+        if (!Utils.isSubSet(S, G)) {
+            System.err.println("Error: 6");
         }
     }
 
@@ -249,12 +264,36 @@ public class TuringMachine {
         TransitionFunction transitionFunction = new TransitionFunction(s.substring(3), Q);
         String input = transitionFunction.getInput();
         String output = transitionFunction.getOutput();
+        boolean valid = true;
         if (input.length() != output.length()) {
             System.err.println("Error: " + lineNo);
-            return false;
+            valid = false;
+        }
+
+        State sourceState = transitionFunction.getSourceState();
+        State destinationState = transitionFunction.getDestinationState();
+        if (sourceState == null) {
+            System.err.println("Error: 7");
+            valid = false;
+        }
+        if (destinationState == null) {
+            System.err.println("Error: 7");
+            valid = false;
+        }
+        if (!G.containsAll(Utils.stringToCharSet(input))) {
+            System.err.println("Error: 8");
+            valid = false;
+        }
+        if (!G.containsAll(Utils.stringToCharSet(output))) {
+            System.err.println("Error: 8");
+            valid = false;
+        }
+        if (Q.get(transitionFunction.getSourceState().getQ()).getDelta(input) != null) {
+            System.err.println("Error: 9");
+            valid = false;
         }
         Q.get(transitionFunction.getSourceState().getQ()).addTransitionFunction(transitionFunction);
-        return true;
+        return valid;
     }
 
 
